@@ -3,8 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VA Services Teaser</title>
     
+    <!-- Primary Meta Tags -->
+    <title>Leigh - Professional Virtual Assistant Services</title>
+    <meta name="title" content="Leigh - Professional Virtual Assistant Services">
+    <meta name="description" content="Experienced Virtual Assistant offering comprehensive business support including admin, finance, HR, and customer service solutions. Available 20-40 hours/week.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-url.com/">
+    <meta property="og:title" content="Leigh - Professional Virtual Assistant Services">
+    <meta property="og:description" content="Comprehensive virtual assistant services including administration, finance, HR, and customer support. Available for 20-40 hours/week with flexible scheduling.">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://your-url.com/">
+    <meta property="twitter:title" content="Leigh - Professional Virtual Assistant Services">
+    <meta property="twitter:description" content="Expert virtual assistance for your business needs. Administration, finance, HR, and customer support services available with flexible scheduling.">
+    <meta property="twitter:image" content="https://via.placeholder.com/1200x630">
+
     <!-- Load React -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -16,295 +34,167 @@
     <style>
         .tab-content {
             display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
         }
         
         .tab-content.active {
             display: block;
+            opacity: 1;
         }
 
-        .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+        .profile-image {
+            transition: transform 0.3s ease;
+        }
+
+        .profile-image:hover {
+            transform: scale(1.05);
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 min-h-screen py-8">
     <div id="root"></div>
 
     <script type="text/babel">
-        function App() {
-            // Initial state
-            const defaultData = {
-                name: "Leigh",
-                photoUrl: "https://via.placeholder.com/200",
-                title: "Virtual Assistant",
-                tagline: "Professional Support for Your Business Growth",
-                email: "contact@example.com",
-                hours: "20-40 hours/week",
-                schedule: "Monday to Friday, Flexible Time Zones",
-                services: {
-                    admin: [
+        function VATeaserApp() {
+            const [activeTab, setActiveTab] = React.useState('admin');
+            const [autoSwitch, setAutoSwitch] = React.useState(true);
+
+            const services = {
+                admin: {
+                    title: "Administrative Support",
+                    items: [
                         "Calendar & Meeting Management",
                         "Documentation Organization",
-                        "Travel Planning"
-                    ],
-                    finance: [
-                        "Bookkeeping & Payroll",
-                        "Vendor Payments",
-                        "Financial Audits"
-                    ],
-                    hr: [
+                        "Travel Planning & Coordination",
+                        "Marketing Material Design (Canva)",
+                        "Basic Web Design",
+                        "Content Management"
+                    ]
+                },
+                finance: {
+                    title: "Financial Support",
+                    items: [
+                        "Monitor Accounts & Bookkeeping",
+                        "Process Vendor Payments",
+                        "Manage Payment Disputes",
+                        "CRM Data Validation",
+                        "Financial Audits",
+                        "Payroll Management"
+                    ]
+                },
+                hr: {
+                    title: "HR Support",
+                    items: [
                         "Recruitment Assistance",
                         "Employee Onboarding",
-                        "Benefits Administration"
-                    ],
-                    customer: [
-                        "Inquiry Management",
+                        "Benefits Administration",
+                        "Contract Management",
+                        "Policy Compliance",
+                        "HR Documentation"
+                    ]
+                },
+                customer: {
+                    title: "Customer Service",
+                    items: [
+                        "Sales & Service Inquiries",
                         "Order Processing",
-                        "Issue Resolution"
+                        "Issue Resolution",
+                        "Client Communication",
+                        "Service Coordination",
+                        "Follow-up Management"
                     ]
                 }
             };
 
-            const [data, setData] = React.useState(defaultData);
-            const [activeTab, setActiveTab] = React.useState('admin');
-            const [showForm, setShowForm] = React.useState(false);
+            // Auto-switch tabs
+            React.useEffect(() => {
+                let interval;
+                if (autoSwitch) {
+                    interval = setInterval(() => {
+                        const tabs = Object.keys(services);
+                        const currentIndex = tabs.indexOf(activeTab);
+                        const nextIndex = (currentIndex + 1) % tabs.length;
+                        setActiveTab(tabs[nextIndex]);
+                    }, 4000);
+                }
+                return () => clearInterval(interval);
+            }, [activeTab, autoSwitch]);
 
-            // Function to handle all text input changes
-            const handleInputChange = (e, field) => {
-                setData({
-                    ...data,
-                    [field]: e.target.value
-                });
-            };
-
-            // Function to handle service changes
-            const handleServiceChange = (category, index, value) => {
-                const newServices = {...data.services};
-                newServices[category][index] = value;
-                setData({
-                    ...data,
-                    services: newServices
-                });
-            };
-
-            // Function to add service
-            const addService = (category) => {
-                const newServices = {...data.services};
-                newServices[category] = [...newServices[category], ""];
-                setData({
-                    ...data,
-                    services: newServices
-                });
-            };
-
-            // Function to remove service
-            const removeService = (category, index) => {
-                const newServices = {...data.services};
-                newServices[category] = newServices[category].filter((_, i) => i !== index);
-                setData({
-                    ...data,
-                    services: newServices
-                });
-            };
-
-            // Form Component
-            const EditForm = () => (
-                <div className="fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-                        <div className="p-6">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-bold">Edit Teaser</h2>
-                                <button 
-                                    onClick={() => setShowForm(false)}
-                                    className="text-gray-500 hover:text-gray-700 text-xl font-bold"
-                                >
-                                    ×
-                                </button>
-                            </div>
-
-                            {/* Basic Information */}
-                            <div className="space-y-4 mb-8">
-                                <h3 className="text-lg font-semibold">Basic Information</h3>
-                                
-                                <div>
-                                    <label className="block mb-1">Name:</label>
-                                    <input
-                                        type="text"
-                                        value={data.name}
-                                        onChange={(e) => handleInputChange(e, 'name')}
-                                        className="w-full p-2 border rounded"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block mb-1">Photo URL:</label>
-                                    <input
-                                        type="text"
-                                        value={data.photoUrl}
-                                        onChange={(e) => handleInputChange(e, 'photoUrl')}
-                                        className="w-full p-2 border rounded"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block mb-1">Title:</label>
-                                    <input
-                                        type="text"
-                                        value={data.title}
-                                        onChange={(e) => handleInputChange(e, 'title')}
-                                        className="w-full p-2 border rounded"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block mb-1">Tagline:</label>
-                                    <input
-                                        type="text"
-                                        value={data.tagline}
-                                        onChange={(e) => handleInputChange(e, 'tagline')}
-                                        className="w-full p-2 border rounded"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block mb-1">Email:</label>
-                                    <input
-                                        type="email"
-                                        value={data.email}
-                                        onChange={(e) => handleInputChange(e, 'email')}
-                                        className="w-full p-2 border rounded"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Services */}
-                            <div className="space-y-6 mb-8">
-                                <h3 className="text-lg font-semibold">Services</h3>
-                                
-                                {Object.entries(data.services).map(([category, services]) => (
-                                    <div key={category} className="space-y-2">
-                                        <h4 className="font-medium capitalize">{category} Services</h4>
-                                        
-                                        {services.map((service, index) => (
-                                            <div key={index} className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={service}
-                                                    onChange={(e) => handleServiceChange(category, index, e.target.value)}
-                                                    className="flex-1 p-2 border rounded"
-                                                />
-                                                <button
-                                                    onClick={() => removeService(category, index)}
-                                                    className="px-3 py-1 text-red-500 hover:bg-red-50 rounded"
-                                                >
-                                                    ×
-                                                </button>
-                                            </div>
-                                        ))}
-                                        
-                                        <button
-                                            onClick={() => addService(category)}
-                                            className="text-blue-600 hover:text-blue-700"
-                                        >
-                                            + Add Service
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Availability */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold">Availability</h3>
-                                
-                                <div>
-                                    <label className="block mb-1">Hours:</label>
-                                    <input
-                                        type="text"
-                                        value={data.hours}
-                                        onChange={(e) => handleInputChange(e, 'hours')}
-                                        className="w-full p-2 border rounded"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block mb-1">Schedule:</label>
-                                    <input
-                                        type="text"
-                                        value={data.schedule}
-                                        onChange={(e) => handleInputChange(e, 'schedule')}
-                                        className="w-full p-2 border rounded"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-
-            // Main Display Component
             return (
-                <div className="max-w-4xl mx-auto p-6">
-                    <button
-                        onClick={() => setShowForm(true)}
-                        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        Edit Teaser
-                    </button>
-
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div className="max-w-4xl mx-auto px-4">
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden"
+                         onMouseEnter={() => setAutoSwitch(false)}
+                         onMouseLeave={() => setAutoSwitch(true)}>
+                        
                         {/* Header */}
-                        <div className="bg-blue-600 p-6 text-white">
-                            <div className="flex items-center gap-6">
-                                <div className="w-24 h-24 rounded-full bg-white/10 border-4 border-white/30 overflow-hidden">
-                                    <img 
-                                        src={data.photoUrl}
-                                        alt={data.name}
-                                        className="w-full h-full object-cover"
-                                    />
+                        <div className="bg-blue-600 p-8 text-white">
+                            <div className="flex items-center gap-8">
+                                <div className="flex-shrink-0">
+                                    <div className="w-28 h-28 rounded-full bg-white/10 border-4 border-white/30 overflow-hidden profile-image">
+                                        <img 
+                                            src="https://via.placeholder.com/200"
+                                            alt="Leigh - Virtual Assistant"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="flex-grow">
-                                    <div className="flex justify-between items-start">
+                                    <div className="flex items-center justify-between">
                                         <div>
-                                            <h2 className="text-2xl font-bold">{data.name}</h2>
-                                            <h3 className="text-xl text-blue-100">{data.title}</h3>
+                                            <h1 className="text-3xl font-bold">Leigh</h1>
+                                            <h2 className="text-xl text-blue-100">Virtual Assistant</h2>
                                         </div>
-                                        <span className="bg-green-500 px-3 py-1 rounded-full text-sm">
+                                        <span className="bg-green-500 px-4 py-1.5 rounded-full text-sm font-medium">
                                             Available Now
                                         </span>
                                     </div>
-                                    <p className="mt-2 text-blue-100">{data.tagline}</p>
+                                    <p className="mt-3 text-blue-50 text-lg">
+                                        Professional Support for Your Business Growth
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Tabs */}
                         <div className="flex border-b">
-                            {Object.keys(data.services).map((category) => (
+                            {Object.entries(services).map(([key, service]) => (
                                 <button
-                                    key={category}
-                                    onClick={() => setActiveTab(category)}
-                                    className={`flex-1 px-4 py-3 text-sm font-medium capitalize
-                                        ${activeTab === category 
+                                    key={key}
+                                    onClick={() => {
+                                        setActiveTab(key);
+                                        setAutoSwitch(false);
+                                    }}
+                                    className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors
+                                        ${activeTab === key 
                                             ? 'bg-blue-600 text-white' 
-                                            : 'text-gray-600 hover:bg-gray-100'}`}
+                                            : 'text-gray-600 hover:bg-gray-50'}`}
                                 >
-                                    {category}
+                                    {service.title}
                                 </button>
                             ))}
                         </div>
 
                         {/* Content */}
-                        {Object.entries(data.services).map(([category, services]) => (
+                        {Object.entries(services).map(([key, service]) => (
                             <div
-                                key={category}
-                                className={`tab-content p-6 ${activeTab === category ? 'active' : ''}`}
+                                key={key}
+                                className={`tab-content p-8 ${activeTab === key ? 'active' : ''}`}
                             >
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {services.map((service, index) => (
-                                        <div key={index} className="flex items-center gap-2">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {service.items.map((item, index) => (
+                                        <div key={index} className="flex items-center gap-3 animate-fade">
                                             <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                                            <span className="text-gray-700">{service}</span>
+                                            <span className="text-gray-700">{item}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -312,29 +202,27 @@
                         ))}
 
                         {/* Footer */}
-                        <div className="p-6 bg-gray-50 border-t">
+                        <div className="p-8 bg-gray-50 border-t">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-gray-600">{data.hours}</p>
-                                    <p className="text-sm text-gray-500">{data.schedule}</p>
+                                    <p className="text-gray-600 font-medium">20-40 hours/week availability</p>
+                                    <p className="text-sm text-gray-500">Monday to Friday, Flexible Time Zones</p>
                                 </div>
                                 <button 
-                                    onClick={() => window.open(`mailto:${data.email}`)}
-                                    className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
+                                    onClick={() => window.open('mailto:leigh@example.com')}
+                                    className="px-8 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-semibold"
                                 >
                                     Get Started
                                 </button>
                             </div>
                         </div>
                     </div>
-
-                    {showForm && <EditForm />}
                 </div>
             );
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(<VATeaserApp />);
     </script>
 </body>
 </html>
