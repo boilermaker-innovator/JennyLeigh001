@@ -1,0 +1,360 @@
+import React, { useState, useEffect } from 'react';
+import { Calendar, FileSpreadsheet, Users, HeadphonesIcon, Search, Settings, X, Plus } from 'lucide-react';
+
+export default function VATeaserCreator() {
+  const [showForm, setShowForm] = useState(false);
+  const [activeTab, setActiveTab] = useState('admin');
+  const [autoSwitch, setAutoSwitch] = useState(true);
+
+  const [formData, setFormData] = useState({
+    name: 'Leigh',
+    photoUrl: '/api/placeholder/200/200', // Default placeholder
+    title: 'Virtual Assistant',
+    tagline: 'Professional Support for Your Business Growth',
+    email: 'leigh@example.com',
+    hours: '20-40 hours/week',
+    schedule: 'Monday to Friday, Flexible Time Zones',
+    services: {
+      admin: [
+        'Manage calendars, meetings, and appointments',
+        'Organize documentation and data entry',
+        'Prepare and format documents',
+        'Design marketing materials (Canva)',
+        'Basic web design and content management',
+        'Arrange travel itineraries and bookings'
+      ],
+      finance: [
+        'Monitor accounts and handle bookkeeping',
+        'Process vendor payments and refunds',
+        'Manage payment disputes',
+        'Validate data in CRM systems',
+        'Perform financial audits',
+        'Handle payroll management'
+      ],
+      hr: [
+        'Assist in recruitment and screening',
+        'Manage employee onboarding',
+        'Handle employee relations',
+        'Administer benefits programs',
+        'Ensure HR policy compliance',
+        'Maintain employee contracts'
+      ],
+      customer: [
+        'Handle sales and service inquiries',
+        'Process customer orders',
+        'Resolve product-related issues',
+        'Manage client communications',
+        'Coordinate service delivery',
+        'Ensure client satisfaction'
+      ],
+      research: [
+        'Conduct market research',
+        'Analyze organizational needs',
+        'Identify operational improvements',
+        'Assist with workflow optimization',
+        'Research industry trends',
+        'Prepare analytical reports'
+      ]
+    }
+  });
+
+  // Service categories configuration
+  const serviceCategories = {
+    admin: {
+      icon: Calendar,
+      title: "Administrative Support",
+      color: "blue"
+    },
+    finance: {
+      icon: FileSpreadsheet,
+      title: "Financial Support",
+      color: "green"
+    },
+    hr: {
+      icon: Users,
+      title: "HR Support",
+      color: "purple"
+    },
+    customer: {
+      icon: HeadphonesIcon,
+      title: "Customer Service",
+      color: "pink"
+    },
+    research: {
+      icon: Search,
+      title: "Research Support",
+      color: "orange"
+    }
+  };
+
+  // Auto-switch tabs
+  useEffect(() => {
+    let interval;
+    if (autoSwitch) {
+      interval = setInterval(() => {
+        const tabs = Object.keys(serviceCategories);
+        const currentIndex = tabs.indexOf(activeTab);
+        const nextIndex = (currentIndex + 1) % tabs.length;
+        setActiveTab(tabs[nextIndex]);
+      }, 4000);
+    }
+    return () => clearInterval(interval);
+  }, [activeTab, autoSwitch]);
+
+  // Form Component
+  const EditForm = () => (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">Edit Teaser</h2>
+            <button 
+              onClick={() => setShowForm(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Basic Information */}
+          <div className="space-y-4 mb-8">
+            <h3 className="text-lg font-semibold text-gray-700">Basic Information</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Profile Photo URL</label>
+                <input
+                  type="url"
+                  value={formData.photoUrl}
+                  onChange={(e) => setFormData({...formData, photoUrl: e.target.value})}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  placeholder="/api/placeholder/200/200"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
+                <input
+                  type="text"
+                  value={formData.tagline}
+                  onChange={(e) => setFormData({...formData, tagline: e.target.value})}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Services */}
+          <div className="space-y-6 mb-8">
+            <h3 className="text-lg font-semibold text-gray-700">Services</h3>
+            {Object.entries(serviceCategories).map(([key, category]) => (
+              <div key={key} className="space-y-2">
+                <h4 className="font-medium text-gray-600">{category.title}</h4>
+                {formData.services[key].map((service, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={service}
+                      onChange={(e) => {
+                        const newServices = {...formData.services};
+                        newServices[key][index] = e.target.value;
+                        setFormData({...formData, services: newServices});
+                      }}
+                      className="flex-grow p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      onClick={() => {
+                        const newServices = {...formData.services};
+                        newServices[key] = newServices[key].filter((_, i) => i !== index);
+                        setFormData({...formData, services: newServices});
+                      }}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={() => {
+                    const newServices = {...formData.services};
+                    newServices[key] = [...newServices[key], ''];
+                    setFormData({...formData, services: newServices});
+                  }}
+                  className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
+                >
+                  <Plus className="w-4 h-4" /> Add Service
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Availability */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-700">Availability</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Hours</label>
+                <input
+                  type="text"
+                  value={formData.hours}
+                  onChange={(e) => setFormData({...formData, hours: e.target.value})}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Schedule</label>
+                <input
+                  type="text"
+                  value={formData.schedule}
+                  onChange={(e) => setFormData({...formData, schedule: e.target.value})}
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Teaser Component
+  const Teaser = () => {
+    const IconComponent = serviceCategories[activeTab].icon;
+    const colorClasses = {
+      blue: "bg-blue-600",
+      green: "bg-green-600",
+      purple: "bg-purple-600",
+      pink: "bg-pink-600",
+      orange: "bg-orange-600"
+    };
+
+    return (
+      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden" 
+           onMouseEnter={() => setAutoSwitch(false)}
+           onMouseLeave={() => setAutoSwitch(true)}>
+        {/* Header with Profile Photo */}
+        <div className={`${colorClasses[serviceCategories[activeTab].color]} transition-colors duration-500 p-6 text-white`}>
+          <div className="flex items-center gap-6">
+            <div className="flex-shrink-0">
+              <div className="w-24 h-24 rounded-full bg-white/10 border-4 border-white/30 overflow-hidden flex items-center justify-center">
+                <img 
+                  src={formData.photoUrl}
+                  alt={formData.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div className="flex-grow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">{formData.name}</h2>
+                  <h3 className="text-xl text-white/90">{formData.title}</h3>
+                </div>
+                <span className="bg-green-500 px-3 py-1 rounded-full text-sm font-medium">
+                  Available Now
+                </span>
+              </div>
+              <p className="mt-2 text-white/80">{formData.tagline}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex overflow-x-auto bg-gray-100">
+          {Object.entries(serviceCategories).map(([key, service]) => (
+            <button
+              key={key}
+              onClick={() => {
+                setActiveTab(key);
+                setAutoSwitch(false);
+              }}
+              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors
+                ${activeTab === key 
+                  ? `${colorClasses[service.color]} text-white` 
+                  : 'text-gray-600 hover:bg-gray-200'}`}
+            >
+              {service.title}
+            </button>
+          ))}
+        </div>
+
+        {/* Content */}
+        <div className="p-6 min-h-[300px]">
+          <div className="flex items-center gap-4 mb-6">
+            <div className={`p-3 ${activeTab === 'admin' ? 'bg-blue-100' : 'bg-gray-100'} rounded-full`}>
+              <IconComponent className={`w-6 h-6 ${colorClasses[serviceCategories[activeTab].color].replace('bg-', 'text-')}`} />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800">
+              {serviceCategories[activeTab].title}
+            </h3>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            {formData.services[activeTab].map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${colorClasses[serviceCategories[activeTab].color]}`} />
+                <span className="text-gray-700">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 bg-gray-50 border-t">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600">{formData.hours}</p>
+              <p className="text-sm text-gray-500">{formData.schedule}</p>
+            </div>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => window.open(`mailto:${formData.email}`)}
+                className={`px-6 py-2 ${colorClasses[serviceCategories[activeTab].color]} text-white rounded-full transition-colors`}
+              >
+                Get Started
+              </button>
+              <button
+                onClick={() => setShowForm(true)}
+                className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 bg-gray-50 space-y-6">
+      <Teaser />
+      {showForm && <EditForm />}
+    </div>
+  );
+}
